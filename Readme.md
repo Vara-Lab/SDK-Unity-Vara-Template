@@ -1,6 +1,6 @@
 # SDK Unity Vara Network Template
 
-This repository contains a template for integrating the Vara network into Unity projects using the Substrate SDK. It provides examples and utilities to facilitate connection and interaction with Vara network nodes.
+This repository contains a template for integrating the Vara network into Unity projects using the Substrate SDK. It provides examples and utilities to facilitate connection and interaction with Vara network.
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ To use this template in your Unity project, follow these steps:
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/your-username/sdk-unity-vara-network-template.git
+   git clone https://github.com/Vara-Lab/SDK-Unity-Vara-Template.git
 
 2. Open the project in Unity:
 
