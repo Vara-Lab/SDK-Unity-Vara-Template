@@ -56,7 +56,7 @@ using System.Threading;
 using UnityEngine;
 using VaraExt = Substrate.Vara.NET.NetApiExt.Generated;
 
-public class Test : MonoBehaviour
+public class VaraTest : MonoBehaviour
 {
     private VaraExt.SubstrateClientExt _clientvara;
     private string url;
