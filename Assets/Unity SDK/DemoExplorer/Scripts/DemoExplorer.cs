@@ -17,13 +17,15 @@ using UnityEngine.UIElements;
 using KusamaExt = Substrate.Kusama.NET.NetApiExt.Generated;
 using LocalExt = Substrate.Hexalem.NET.NetApiExt.Generated;
 using PolkadotExt = Substrate.Polkadot.NET.NetApiExt.Generated;
+using VaraExt = Substrate.Vara.NET.NetApiExt.Generated;
+
 
 namespace Substrate
 {
     public enum SubstrateChains
     {
-        Polkadot,
-        Kusama,
+        Vara,
+        Testnet,
         Local,
     }
 
@@ -41,10 +43,10 @@ namespace Substrate
         public static Account Alice => Account.Build(KeyType.Sr25519, MiniSecretAlice.ExpandToSecret().ToBytes(), MiniSecretAlice.GetPair().Public.Key);
 
         [SerializeField]
-        private string _polkadotNode = "wss://rpc.vara.network";
+        private string _varaNode = "wss://rpc.vara.network";
 
         [SerializeField]
-        private string _kusamaNode = "wss://testnet.vara.network";
+        private string _testNode = "wss://testnet.vara.network";
 
         private Label _lblNodeUrl;
         private Label _lblNodeInfo;
@@ -59,14 +61,20 @@ namespace Substrate
         private VisualElement _velChainLogo;
 
         private SubstrateClient _client;
+
+        private SubstrateClient _clientvara;
         private bool _running = false;
 
-        private Texture2D _polkadotLogo, _kusamaLogo, _hostLogo;
+        private Texture2D _varaLogo, _hostLogo;
         private Texture2D _checkYes, _checkNo;
 
         private Func<CancellationToken, Task<RuntimeVersion>> StateRuntimeVersion { get; set; }
         private Func<CancellationToken, Task<Properties>> SystemProperties { get; set; }
         private Func<CancellationToken, Task<U32>> SystemStorageNumber { get; set; }
+
+        private Func<CancellationToken, Task<U32>> SystemStorageNumberVara { get; set; }
+
+
         private Func<CancellationToken, Task<U32>> SystemStorageCustom { get; set; }
 
         private JsonSerializerOptions _jsonSerializerOptions;
@@ -82,8 +90,7 @@ namespace Substrate
                 //Converters = { new BigIntegerConverter() }
             };
 
-            _polkadotLogo = Resources.Load<Texture2D>("DemoExplorer/Icons/polkadot_logo");
-            _kusamaLogo = Resources.Load<Texture2D>("DemoExplorer/Icons/kusama_logo");
+            _varaLogo = Resources.Load<Texture2D>("DemoExplorer/Icons/polkadot_logo");
             _hostLogo = Resources.Load<Texture2D>("DemoExplorer/Icons/host_logo");
 
             _checkYes = Resources.Load<Texture2D>("DemoExplorer/Icons/check_yes");
@@ -111,10 +118,10 @@ namespace Substrate
             _velSelectionArray = new List<VisualElement>();
 
             var velSelPolkadotCheck = velMainView.Q<VisualElement>("VelSelPolkadotCheck");
-            velSelPolkadotCheck.RegisterCallback<ClickEvent>(ev => OnSelectClicked(SubstrateChains.Polkadot));
+            velSelPolkadotCheck.RegisterCallback<ClickEvent>(ev => OnSelectClicked(SubstrateChains.Vara));
             _velSelectionArray.Add(velSelPolkadotCheck);
             var velSelKusamaCheck = velMainView.Q<VisualElement>("VelSelKusamaCheck");
-            velSelKusamaCheck.RegisterCallback<ClickEvent>(ev => OnSelectClicked(SubstrateChains.Kusama));
+            velSelKusamaCheck.RegisterCallback<ClickEvent>(ev => OnSelectClicked(SubstrateChains.Testnet));
             _velSelectionArray.Add(velSelKusamaCheck);
             var velSelLocalCheck = velMainView.Q<VisualElement>("VelSelLocalCheck");
             velSelLocalCheck.RegisterCallback<ClickEvent>(ev => OnSelectClicked(SubstrateChains.Local));
@@ -139,7 +146,7 @@ namespace Substrate
             _lblCmdTransfer.RegisterCallback<ClickEvent>(ev => OnTransferClicked());
 
             // initialize
-            OnSelectClicked(SubstrateChains.Polkadot);
+            OnSelectClicked(SubstrateChains.Vara);
         }
 
         /// <summary>
@@ -178,11 +185,11 @@ namespace Substrate
             string url = string.Empty;
             switch (substrateChain)
             {
-                case SubstrateChains.Polkadot:
+                case SubstrateChains.Vara:
                     {
-                        url = _polkadotNode;
+                        url = _varaNode;
                         _lblNodeUrl.text = url;
-                        _velChainLogo.style.backgroundImage = _polkadotLogo;
+                        _velChainLogo.style.backgroundImage = _varaLogo;
                         _client = new PolkadotExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
 
                         StateRuntimeVersion = ((PolkadotExt.SubstrateClientExt)_client).State.GetRuntimeVersionAsync;
@@ -193,18 +200,38 @@ namespace Substrate
                     }
                     break;
 
-                case SubstrateChains.Kusama:
+                case SubstrateChains.Testnet:
                     {
-                        url = _kusamaNode;
+                        url = _testNode;
                         _lblNodeUrl.text = url;
-                        _velChainLogo.style.backgroundImage = _kusamaLogo;
-                        _client = new KusamaExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
+                        _velChainLogo.style.backgroundImage = _varaLogo;
+                        _client = new PolkadotExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
 
-                        StateRuntimeVersion = ((KusamaExt.SubstrateClientExt)_client).State.GetRuntimeVersionAsync;
-                        SystemProperties = ((KusamaExt.SubstrateClientExt)_client).System.PropertiesAsync;
-                        SystemStorageNumber = ((KusamaExt.SubstrateClientExt)_client).SystemStorage.Number;
+                        StateRuntimeVersion = ((PolkadotExt.SubstrateClientExt)_client).State.GetRuntimeVersionAsync;
+                        SystemProperties = ((PolkadotExt.SubstrateClientExt)_client).System.PropertiesAsync;
+                        SystemStorageNumber = ((PolkadotExt.SubstrateClientExt)_client).SystemStorage.Number;
 
-                        SystemStorageCustom = ((KusamaExt.SubstrateClientExt)_client).SystemStorage.EventCount;
+                        SystemStorageCustom = ((PolkadotExt.SubstrateClientExt)_client).SystemStorage.EventCount;
+                        _clientvara = new VaraExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
+
+                        try
+                        {
+                            // Llama al método asíncrono para obtener el número de bloque
+                            var chainTask = ((VaraExt.SubstrateClientExt)_clientvara).SystemStorage.Number("0x5566b75d68e2daf786088daa6aaf6e67aadc4a666d57f55d5e71aa7cee92c82e",CancellationToken.None);
+                           
+                           // Espera a que la tarea se complete y obtén el resultado
+                            var chain = await chainTask;
+                            // Imprime el número de bloque en la consola
+                            Debug.Log($"Current block number: {chain}");
+                            Console.WriteLine($"Error fetching block number: {chain}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error fetching block number: {ex.Message}");
+                        }
+
+
+
                     }
                     break;
 
