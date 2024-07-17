@@ -79,7 +79,7 @@ else
     // Log a message indicating that the client is not connected
     Debug.Log("Client is not connected.");
 }
-
+```
 
 ### Explicación
 
@@ -91,8 +91,6 @@ else
 6. **Log the data**: Logs the retrieved data to both the Unity debug console and the standard console.
 
 This should help users understand how to use the `SubstrateClientExt` to connect to a Vara network node and interact with it.
-
-
 
 
 
