@@ -49,6 +49,9 @@ To use this template in your Unity project, follow these steps:
 The following code snippet demonstrates how to initialize, connect, and interact with the Vara network using `SubstrateClientExt` in Unity. It includes comments to explain each step.
 
 ```csharp
+// Import VaraExt
+using VaraExt = Substrate.Vara.NET.NetApiExt.Generated;
+
 // Assign the test node URL to the variable url
 url = "wss://testnet.vara.network";
 
