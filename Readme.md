@@ -50,7 +50,7 @@ The following code snippet demonstrates how to initialize, connect, and interact
 
 ```csharp
 // Assign the test node URL to the variable url
-url = _testNode;
+url = "wss://testnet.vara.network";
 
 // Initialize the Substrate client with the node URL and the default transaction payment method
 _clientvara = new VaraExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
@@ -81,7 +81,7 @@ else
 }
 ```
 
-### Explicación
+### Explanation
 
 1. **Assign the test node URL to the variable `url`**: This line assigns the test node URL to the `url` variable.
 2. **Initialize the Substrate client**: Initializes the `SubstrateClientExt` with the provided URL and default transaction payment method.
@@ -91,7 +91,6 @@ else
 6. **Log the data**: Logs the retrieved data to both the Unity debug console and the standard console.
 
 This should help users understand how to use the `SubstrateClientExt` to connect to a Vara network node and interact with it.
-
 
 
 ## License
