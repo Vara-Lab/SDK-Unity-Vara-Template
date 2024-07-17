@@ -210,28 +210,6 @@ namespace Substrate
                         SystemProperties = ((PolkadotExt.SubstrateClientExt)_client).System.PropertiesAsync;
                         SystemStorageNumber = ((PolkadotExt.SubstrateClientExt)_client).SystemStorage.Number;
                         SystemStorageCustom = ((PolkadotExt.SubstrateClientExt)_client).SystemStorage.EventCount;
-                        
-                        // Example
-                        _clientvara = new VaraExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
-                        await _clientvara.ConnectAsync();
-                        if (_clientvara != null && _clientvara.IsConnected)
-                        {
-                            Debug.Log("Client is connected.");
-
-                            var numberTask = ((VaraExt.SubstrateClientExt)_clientvara).SystemStorage.Number("0x84d1c0434d95f92501d18115c6df68b9cbed62aa75e3e7b9b031b0225acaafcc", CancellationToken.None);
-                        
-                            var data = await numberTask;
-        
-                            Debug.Log($"Data: {data}");
-                            Console.WriteLine($"DataError : {data}");
-                        }
-                        else
-                        {
-                            Debug.Log("Client is not connected.");
-                        }
-
-
-
 
                     }
                     break;

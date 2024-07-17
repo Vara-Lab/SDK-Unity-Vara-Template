@@ -98,6 +98,7 @@
     <Compile Include="Assets\Unity SDK\DemoWallet\Scripts\ScreenSubStates\MainDashboardSubState.cs" />
     <Compile Include="Assets\Unity SDK\DemoExplorer\Scripts\BigIntegerConverter.cs" />
     <Compile Include="Assets\Unity SDK\DemoGame\Scripts\ScreenSubState\PlayFinishSubState.cs" />
+    <Compile Include="Assets\Examples\Vara-Unity.cs" />
     <Compile Include="Assets\Unity SDK\DemoGame\Scripts\Network\StorageManager.cs" />
     <Compile Include="Assets\Unity SDK\DemoGame\Scripts\ScreenSubState\PlayWaitingSubState.cs" />
     <Compile Include="Assets\Unity SDK\Scripts\ScreenStateMachine.cs" />
