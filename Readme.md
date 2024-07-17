@@ -72,7 +72,6 @@ if (_clientvara != null && _clientvara.IsConnected)
 
     // Log the retrieved data to the debug console and the standard console
     Debug.Log($"Data: {data}");
-    Console.WriteLine($"DataError: {data}");
 }
 else
 {
