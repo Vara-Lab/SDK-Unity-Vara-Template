@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
-using KusamaExt = Substrate.Kusama.NET.NetApiExt.Generated;
 using LocalExt = Substrate.Hexalem.NET.NetApiExt.Generated;
 using PolkadotExt = Substrate.Polkadot.NET.NetApiExt.Generated;
 using VaraExt = Substrate.Vara.NET.NetApiExt.Generated;
@@ -72,7 +71,7 @@ namespace Substrate
         private Func<CancellationToken, Task<Properties>> SystemProperties { get; set; }
         private Func<CancellationToken, Task<U32>> SystemStorageNumber { get; set; }
 
-        private Func<CancellationToken, Task<U32>> SystemStorageNumberVara { get; set; }
+        private Func<CancellationToken, Task<int>> SystemStorageNumberVara { get; set; }
 
 
         private Func<CancellationToken, Task<U32>> SystemStorageCustom { get; set; }
@@ -210,25 +209,27 @@ namespace Substrate
                         StateRuntimeVersion = ((PolkadotExt.SubstrateClientExt)_client).State.GetRuntimeVersionAsync;
                         SystemProperties = ((PolkadotExt.SubstrateClientExt)_client).System.PropertiesAsync;
                         SystemStorageNumber = ((PolkadotExt.SubstrateClientExt)_client).SystemStorage.Number;
-
                         SystemStorageCustom = ((PolkadotExt.SubstrateClientExt)_client).SystemStorage.EventCount;
+                        
+                        // Example
                         _clientvara = new VaraExt.SubstrateClientExt(new Uri(url), ChargeTransactionPayment.Default());
+                        await _clientvara.ConnectAsync();
+                        if (_clientvara != null && _clientvara.IsConnected)
+                        {
+                            Debug.Log("Client is connected.");
 
-                        try
-                        {
-                            // Llama al método asíncrono para obtener el número de bloque
-                            var chainTask = ((VaraExt.SubstrateClientExt)_clientvara).SystemStorage.Number("0x5566b75d68e2daf786088daa6aaf6e67aadc4a666d57f55d5e71aa7cee92c82e",CancellationToken.None);
-                           
-                           // Espera a que la tarea se complete y obtén el resultado
-                            var chain = await chainTask;
-                            // Imprime el número de bloque en la consola
-                            Debug.Log($"Current block number: {chain}");
-                            Console.WriteLine($"Error fetching block number: {chain}");
+                            var numberTask = ((VaraExt.SubstrateClientExt)_clientvara).SystemStorage.Number("0x84d1c0434d95f92501d18115c6df68b9cbed62aa75e3e7b9b031b0225acaafcc", CancellationToken.None);
+                        
+                            var data = await numberTask;
+        
+                            Debug.Log($"Data: {data}");
+                            Console.WriteLine($"DataError : {data}");
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Console.WriteLine($"Error fetching block number: {ex.Message}");
+                            Debug.Log("Client is not connected.");
                         }
+
 
 
 
