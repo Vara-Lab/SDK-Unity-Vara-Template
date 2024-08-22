@@ -245,16 +245,26 @@ public class ProgramReadState : MonoBehaviour
 
 ```
 
-### Explanation
+## Explanation
 
-1. **Assign the test node URL to the variable `url`**: This line assigns the test node URL to the `url` variable.
-2. **Initialize the Substrate client**: Initializes the `SubstrateClientExt` with the provided URL and default transaction payment method.
-3. **Connect the client asynchronously**: Connects the client to the node asynchronously using `ConnectAsync`.
-4. **Check if the client is connected**: Checks if the client is not null and is connected using the `IsConnected` property.
-5. **Retrieve data from the system storage**: Calls the `Number` method on the system storage with a specific key and waits for the task to complete.
-6. **Log the data**: Logs the retrieved data to both the Unity debug console and the standard console.
+1. **Assign the test node URL to the variable `url`**:  
+   In each example, the `url` variable holds the WebSocket URL that connects to the Vara test network. This URL points to the node where all interactions take place, such as querying the blockchain state, sending transactions, or interacting with smart contracts.
 
-This should help users understand how to use the `SubstrateClientExt` to connect to a Vara network node and interact with it.
+2. **Generate or use an account**:  
+   For most examples, an account is either generated from a provided seed or used directly. This account is necessary for signing transactions and authenticating actions on the blockchain. It’s crucial to keep the seed secure as it can regenerate the account’s private keys.
+
+3. **Initialize the Substrate client**:  
+   The `SubstrateClientExt` is initialized with the `url`, which establishes the connection between your Unity project and the Vara blockchain node. This client handles all interactions with the blockchain, including sending transactions and querying data.
+
+4. **Connect the client asynchronously**:  
+   The client connects to the blockchain node asynchronously. This ensures that the connection is established without blocking the main thread, which is important for maintaining responsiveness in Unity.
+
+5. **Interact with the blockchain**:  
+   Depending on the example, the interaction might involve retrieving the account balance, sending a transaction, or querying the state of a smart contract. These operations are performed asynchronously to ensure that Unity's main thread remains responsive.
+
+6. **Log the results**:  
+   After completing the blockchain interaction, the results are logged using Unity's `Debug.Log`. This logging helps with debugging by displaying the output directly in the Unity console, allowing developers to verify that the operations have been executed successfully.
+
 
 ## Contributing
 
