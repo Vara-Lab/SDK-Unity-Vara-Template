@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "SDK-Unity-Vara-new.sln"
+    "dotnet.defaultSolution": "SDK-Unity-Vara-Template-T.sln"
 }
