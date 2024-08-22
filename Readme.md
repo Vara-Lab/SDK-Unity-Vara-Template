@@ -89,7 +89,7 @@ public class Balance : MonoBehaviour
     {
         // Asynchronously fetch the account balance for the specified account address.
         // The address is provided in hex format.
-        U128 balance = await BalanceService.GetAccountBalanceAsync(url, "0x96bc6c65c1a0579886003e9c796ac1a9a9e9c4abc7b74d3b1cf399aaf35d7139");
+        U128 balance = await BalanceService.GetAccountBalanceAsync(url, "0x......");
 
         // Log the retrieved balance to the Unity console.
         // This is useful for debugging and verifying that the correct balance is retrieved.
@@ -217,10 +217,10 @@ public class ProgramReadState : MonoBehaviour
         string query = "Current";
 
         // The sender's address in hexadecimal format, which will be used to sign the transaction or query.
-        string sender = "0xe4fa3b466792dcd7e58f5d8d49bc4631b5eec3a9ebe48ffe79f859dadf76cb71";
+        string sender = "0x......";
 
         // The program ID corresponding to the deployed contract on the Vara blockchain.
-        string programId = "0xd77336c9c6b6299f4260d520e96a2705e1cc290a242d1c2ad54999410bc77d85";
+        string programId = "0x......";
 
         // Set the gas limit for executing the transaction or query. This defines the computational resources allocated for the operation.
         long gasLimit = 100000000000; // High gas limit to ensure execution.
