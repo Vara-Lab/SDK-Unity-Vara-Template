@@ -13,14 +13,15 @@ public static class QueryService
     private static string _currentUrl;
 
     public static async Task<object> QueryStateAsync(
-        string url, 
-        string idl, 
-        string service, 
-        string query, 
-        string actorId, 
-        string programId, 
-        long gasLimit, 
-        int value, 
+        string url,
+        string idl,
+        string service,
+        string query,
+        string type,
+        string actorId,
+        string programId,
+        long gasLimit,
+        int value,
         byte[] payload = null)
     {
         await EnsureClientConnectedAsync(url);
@@ -34,7 +35,7 @@ public static class QueryService
         byte[] messagePayload = CreateMessagePayload(service, query, payload);
         RpcResult rpcResult = await InvokeGearCalculateReply(actorId, programId, messagePayload, gasLimit, value);
         byte[] queryBytes = ExtractRelevantBytes(rpcResult.Payload.ConvertAll(b => (byte)b).ToArray(), service, query);
-        object decodedResult = DecodeQueryResult(queryBytes, idl, query);
+        object decodedResult = DecodeQueryResult(queryBytes, type, query);
 
         return decodedResult ?? queryBytes;
     }
@@ -87,31 +88,31 @@ public static class QueryService
         }
         if (value <= 0x3FFFFFFF)
         {
-            return new byte[] { 
-                (byte)((value << 2) | 0x02), 
-                (byte)(value >> 6), 
-                (byte)(value >> 14), 
-                (byte)(value >> 22) 
+            return new byte[] {
+                (byte)((value << 2) | 0x02),
+                (byte)(value >> 6),
+                (byte)(value >> 14),
+                (byte)(value >> 22)
             };
         }
         throw new ArgumentOutOfRangeException(nameof(value), "Value too large to be encoded as compact integer");
     }
 
     private static async Task<RpcResult> InvokeGearCalculateReply(
-        string actorId, 
-        string programId, 
-        byte[] messagePayload, 
-        long gasLimit, 
+        string actorId,
+        string programId,
+        byte[] messagePayload,
+        long gasLimit,
         int value)
     {
         return await _client.InvokeAsync<RpcResult>(
             "gear_calculateReplyForHandle",
             new object[] {
-                actorId, 
-                programId, 
-                ConvertToHex(messagePayload), 
-                gasLimit, 
-                value, 
+                actorId,
+                programId,
+                ConvertToHex(messagePayload),
+                gasLimit,
+                value,
                 null
             },
             CancellationToken.None
@@ -126,7 +127,7 @@ public static class QueryService
     private static byte[] ExtractRelevantBytes(byte[] stateBytes, string service, string query)
     {
         int lastPrefixIndex = GetLastPrefixIndex(stateBytes, service, query);
-        
+
         if (lastPrefixIndex < stateBytes.Length)
         {
             byte[] relevantBytes = new byte[stateBytes.Length - lastPrefixIndex];
@@ -179,27 +180,66 @@ public static class QueryService
         return -1;
     }
 
-    private static object DecodeQueryResult(byte[] queryBytes, string idl, string query)
+    public static object DecodeQueryResult(byte[] queryBytes, string type, string query)
     {
-        Dictionary<string, string> queries = QueryExtractorService.ExtractQueries(idl);
-        foreach (var q in queries)
+        if (!ValidateInputs(queryBytes, type, query))
         {
-            if (q.Key == query)
-            {
-                try
-                {
-                    IDecoder decoder = DecoderFactory.GetDecoder(q.Value);
-                    return decoder.Decode(queryBytes);
-                }
-                catch (NotSupportedException ex)
-                {
-                    Debug.LogError(ex.Message);
-                    return null;
-                }
-            }
+            return null;
         }
-        return null;
+
+        return ExecuteDecoding(queryBytes, type);
     }
+
+    private static bool ValidateInputs(byte[] queryBytes, string type, string query)
+    {
+        if (queryBytes == null || queryBytes.Length == 0)
+        {
+            LogError("Query bytes are null or empty.");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(type))
+        {
+            LogError("Type is null or empty.");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            LogError("Query is null or empty.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static object ExecuteDecoding(byte[] queryBytes, string type)
+    {
+        try
+        {
+            IDecoder decoder = DecoderFactory.GetDecoder(type);
+            return decoder.Decode(queryBytes);
+        }
+        catch (NotSupportedException ex)
+        {
+            LogError($"Decoding failed: {ex.Message}");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            LogError($"Unexpected error during decoding: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static void LogError(string message)
+    {
+
+        Debug.LogError(message);
+    }
+
+
+
 
     public class RpcResult
     {
