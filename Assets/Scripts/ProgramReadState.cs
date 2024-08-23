@@ -12,6 +12,8 @@ public class ProgramReadState : MonoBehaviour
 
     // The query that will be executed on the contract to retrieve the current state.
     string query = "Name";
+
+    // Expected return type of the query.
     string type = "str";
 
     // The sender's address in hexadecimal format, which will be used to sign the transaction or query.
@@ -59,7 +61,7 @@ public class ProgramReadState : MonoBehaviour
         url, idl, service, query, type, sender, programId, gasLimit, value, payload: null
     );
 
-    Debug.Log($"Actor ID: {result}");
+    Debug.Log($"Result: {result}");
 
 
 
