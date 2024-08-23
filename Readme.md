@@ -163,7 +163,6 @@ public class ProgramSendMessage : MonoBehaviour
         var aliceAccount = AccountService.GenerateAccount(hexSeed);
 
         // Define the smart contract service and function to call.
-        // 'TrafficLight' is the service, and 'Red' is the function.
         string service = "MyService";
         string function = "function";
 
@@ -211,10 +210,13 @@ public class ProgramReadState : MonoBehaviour
     {
         // Define the service and function to interact with in the smart contract.
         // 'TrafficLight' is the service.
-        string service = "TrafficLight";
+        string service = "MyService";
 
         // The query that will be executed on the contract to retrieve the current state.
-        string query = "Current";
+        string query = "Myquery";
+       
+       // Expected return type of the query.
+        string type = "query type";
 
         // The sender's address in hexadecimal format, which will be used to sign the transaction or query.
         string sender = "0x......";
@@ -235,7 +237,7 @@ public class ProgramReadState : MonoBehaviour
         // Asynchronously query the state of the smart contract using the QueryService.
         // The query will return the current state as described in the IDL.
         object result = await QueryService.QueryStateAsync(
-            url, idl, service, query, sender, programId, gasLimit, value, payload: null
+            url, idl, service, query, type, sender, programId, gasLimit, value, payload: null
         );
 
         // Log the result of the query to the Unity console for debugging and verification.
