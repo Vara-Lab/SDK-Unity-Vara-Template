@@ -11,36 +11,54 @@ public static class ScaleDecodingService
     /// Decodes a SCALE encoded byte array to the specified type.
     /// </summary>
     /// <param name="scaleData">The SCALE encoded byte array.</param>
-    /// <param name="type">The type to decode to (e.g., "str", "IoTrafficLightState", "vec struct { actor_id, str }").</param>
+    /// <param name="type">The type to decode to (e.g., "str", "u128", "vec struct { actor_id, str }").</param>
     /// <returns>The decoded object as a string representation.</returns>
     public static T Decode<T>(string type, byte[] scaleData)
-{
-    int index = 0;
-    object result = type switch
-    {
-        "str" => DecodeStringField(scaleData),
-        "vec struct { actor_id, str }" => DecodeVecActorIdStr(scaleData),
-        "[u8;32]" => DecodeActorId(scaleData, ref index),
-        "u8" => DecodeU8(scaleData, ref index),
-        "u16" => DecodeU16(scaleData, ref index),
-        "u32" => DecodeU32(scaleData, ref index),
-        "u64" => DecodeU64(scaleData, ref index),
-        "u128" => DecodeU128(scaleData, ref index),
-        "i8" => DecodeI8(scaleData, ref index),
-        "i16" => DecodeI16(scaleData, ref index),
-        "i32" => DecodeI32(scaleData, ref index),
-        "i64" => DecodeI64(scaleData, ref index),
-        _ => throw new NotSupportedException($"The type '{type}' is not supported for decoding.")
-    };
-
-    return (T)result;
-}
-
-    public static List<(string, string)> DecodeVecActorIdStr(byte[] scaleData)
     {
         int index = 0;
+        object result = type switch
+        {
+            "String" => DecodeStringField(scaleData),
+            "vec struct { actor_id, str }" => DecodeVecActorIdStr(scaleData, ref index),
+            "[u8;32]" => DecodeActorId(scaleData, ref index),
+            "u8" => DecodeU8(scaleData, ref index),
+            "u16" => DecodeU16(scaleData, ref index),
+            "u32" => DecodeU32(scaleData, ref index),
+            "u64" => DecodeU64(scaleData, ref index),
+            "u128" => DecodeU128(scaleData, ref index),
+            "i8" => DecodeI8(scaleData, ref index),
+            "i16" => DecodeI16(scaleData, ref index),
+            "i32" => DecodeI32(scaleData, ref index),
+            "i64" => DecodeI64(scaleData, ref index),
+            "U256" => DecodeU256(scaleData, ref index),
+            "Vec<[u8;32]>" => DecodeVecActorId(scaleData, ref index),
 
-        List<(string, string)> allUsers = new List<(string, string)>();
+            _ => throw new NotSupportedException($"The type '{type}' is not supported for decoding.")
+        };
+
+        return (T)result;
+    }
+    public static List<string> DecodeVecActorId(byte[] scaleData, ref int index)
+    {
+        List<string> actorIds = new List<string>();
+        int numberOfUsers = DecodeCompactLength(scaleData, ref index);
+
+        for (int i = 0; i < numberOfUsers; i++)
+        {
+            string actorId = DecodeActorId(scaleData, ref index);
+            Debug.Log($"Actor ID: {actorId} at index {index}");
+            actorIds.Add(actorId);
+            DecodeStringField(scaleData);
+        }
+
+        return actorIds;
+    }
+
+    public static List<(string, string)> DecodeVecActorIdStr(byte[] scaleData, ref int index)
+    {
+
+
+        List<(string, string)> all = new List<(string, string)>();
         int numberOfUsers = DecodeCompactLength(scaleData, ref index);
 
 
@@ -48,13 +66,13 @@ public static class ScaleDecodingService
         {
             string actorId = DecodeActorId(scaleData, ref index);
             Debug.Log($"Actor ID: {actorId} at index {index}");
-            string userName = DecodeString(scaleData, ref index);
-            Debug.Log($"User Name: {userName} at index {index}");
-            allUsers.Add((actorId, userName));
+            string strType = DecodeString(scaleData, ref index);
+            Debug.Log($"User Name: {strType} at index {index}");
+            all.Add((actorId, strType));
         }
 
 
-        return allUsers;
+        return all;
     }
 
     public static string DecodeString(byte[] bytes, ref int index)
@@ -183,6 +201,23 @@ public static class ScaleDecodingService
         Array.Reverse(u128Bytes);
         return new BigInteger(u128Bytes);
     }
+
+    public static string DecodeU256(byte[] bytes, ref int index)
+    {
+        if (index + 32 > bytes.Length)
+            throw new ArgumentOutOfRangeException("Index and count must refer to a location within the buffer.");
+
+        byte[] u256Bytes = new byte[32];
+        Array.Copy(bytes, index, u256Bytes, 0, 32);
+        index += 32;
+
+        var result = new BigInteger(u256Bytes);
+
+        string hexValue = result.ToString("X").PadLeft(64, '0');
+
+        return "0x" + hexValue;
+    }
+
 
     public static sbyte DecodeI8(byte[] bytes, ref int index)
     {
