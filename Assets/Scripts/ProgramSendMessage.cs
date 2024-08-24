@@ -1,4 +1,6 @@
 using UnityEngine;
+using System;
+using System.Numerics;
 using Substrate.NetApi.Model.Types.Primitive;
 
 public class ProgramSendMessage : MonoBehaviour
@@ -17,11 +19,20 @@ public class ProgramSendMessage : MonoBehaviour
 
         // Define the smart contract service and function to call.
         // 'TrafficLight' is the service, and 'Red' is the function.
-        string service = "TrafficLight";
-        string function = "Red";
+        string service = "Vft";
+        string function = "TransferFrom";
 
         // The program ID representing the deployed contract on the Vara blockchain.
-        string programId = "0xd77336c9c6b6299f4260d520e96a2705e1cc290a242d1c2ad54999410bc77d85";
+        string programId = "0x9b70e858462eedf89896808af3082673b740404961c118109a2217536c907f5a";
+
+        byte[] from = Utilities.HexStringToByteArray("0x96bc6c65c1a0579886003e9c796ac1a9a9e9c4abc7b74d3b1cf399aaf35d7139");
+
+        byte[] to = Utilities.HexStringToByteArray("0xe4fa3b466792dcd7e58f5d8d49bc4631b5eec3a9ebe48ffe79f859dadf76cb71");
+
+        byte[] amount = Utilities.U256ToByteArray(50);
+
+        byte[] payload = Utilities.ConcatenatePayload(from,to, amount);
+
 
         // Define the gas limit for executing the transaction. This sets how much computational effort can be used.
         U64 gasLimit = new U64(90000000000); // Arbitrary high gas limit for this transaction.
@@ -36,11 +47,14 @@ public class ProgramSendMessage : MonoBehaviour
         // Asynchronously send the message to the smart contract using VaraService.
         // No additional payload is included (set to null).
         string result = await VaraService.SendMessageAsync(
-            url, service, function, programId, aliceAccount, gasLimit, value, keepAlive, payload: null
+            url, service, function, programId, aliceAccount, gasLimit, value, keepAlive, payload
         );
 
         // Log the result of the message sending operation to the Unity console.
         // This will show the transaction status or result, useful for debugging.
         Debug.Log($"Result: {result}");
     }
+
+
+
 }
