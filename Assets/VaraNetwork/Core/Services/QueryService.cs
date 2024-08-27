@@ -14,7 +14,6 @@ public static class QueryService
 
     public static async Task<object> QueryStateAsync(
         string url,
-        string idl,
         string service,
         string query,
         string type,
