@@ -280,6 +280,3 @@ We welcome contributions to this project! If you'd like to contribute, please fo
 
 3. **Submit a Pull Request**:  
    Once your changes are ready, submit a pull request to the `main` branch. Be sure to include a detailed description of your changes and the problem they solve.
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
